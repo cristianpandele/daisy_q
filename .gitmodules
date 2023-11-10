@@ -4,3 +4,9 @@
 [submodule "lib/q"]
 	path = lib/q
 	url = git@github.com:cycfi/q.git
+[submodule "dubby"]
+	path = dubby
+	url = https://gitlab.com/componental/dubby/
+[submodule "lib/DaisySP"]
+	path = lib/DaisySP
+	url = https://github.com/electro-smith/DaisySP
