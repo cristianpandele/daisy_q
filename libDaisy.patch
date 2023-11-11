@@ -1,0 +1,39 @@
+diff --git a/cmake/toolchains/stm32h750xx.cmake b/cmake/toolchains/stm32h750xx.cmake
+index 91f52c39..d15682b6 100644
+--- a/cmake/toolchains/stm32h750xx.cmake
++++ b/cmake/toolchains/stm32h750xx.cmake
+@@ -8,7 +8,7 @@ if(NOT DEFINED TOOLCHAIN_PREFIX)
+     if(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
+         set(TOOLCHAIN_PREFIX "/usr")
+     elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL Darwin)
+-        set(TOOLCHAIN_PREFIX "/usr/local")
++        set(TOOLCHAIN_PREFIX "/Applications/ArmGNUToolchain/13.2.Rel1/arm-none-eabi")
+     elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL Windows)
+         message(STATUS "Please specify the TOOLCHAIN_PREFIX !\n For example: -DTOOLCHAIN_PREFIX=\"C:/Program Files/GNU Tools ARM Embedded\" ")
+     else()
+@@ -64,8 +64,8 @@ set(CMAKE_EXE_LINKER_FLAGS "${MCU} -Wl,--gc-sections --specs=nano.specs --specs=
+ # Options for DEBUG build
+ # -Og   Enables optimizations that do not interfere with debugging.
+ # -g    Produce debugging information in the operating system’s native format.
+-set(CMAKE_C_FLAGS_DEBUG "-O0 -g" CACHE INTERNAL "C Compiler options for debug build type")
+-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g" CACHE INTERNAL "C++ Compiler options for debug build type")
++set(CMAKE_C_FLAGS_DEBUG "-O2 -g" CACHE INTERNAL "C Compiler options for debug build type")
++set(CMAKE_CXX_FLAGS_DEBUG "-O2 -g" CACHE INTERNAL "C++ Compiler options for debug build type")
+ set(CMAKE_ASM_FLAGS_DEBUG "-g" CACHE INTERNAL "ASM Compiler options for debug build type")
+ set(CMAKE_EXE_LINKER_FLAGS_DEBUG "" CACHE INTERNAL "Linker options for debug build type")
+ 
+diff --git a/src/per/sai.cpp b/src/per/sai.cpp
+index bce0bb7e..9ee431b7 100644
+--- a/src/per/sai.cpp
++++ b/src/per/sai.cpp
+@@ -207,8 +207,8 @@ SaiHandle::Result SaiHandle::Impl::Init(const SaiHandle::Config& config)
+ SaiHandle::Result SaiHandle::Impl::DeInit()
+ {
+     // Must have been initialized before deinitialization
+-    if(&config_ == nullptr)
+-        return Result::ERR;
++    // if(&config_ == nullptr)
++    //     return Result::ERR;
+ 
+     DeInitDma(PeripheralBlock::BLOCK_A);
+     DeInitDma(PeripheralBlock::BLOCK_B);
