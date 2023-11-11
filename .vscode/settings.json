@@ -1,0 +1,8 @@
+{
+    "cmake.configureArgs": [
+        "-DCMAKE_TOOLCHAIN_FILE=lib/libDaisy/cmake/toolchains/stm32h750xx.cmake"
+    ],
+    "cmake.additionalCompilerSearchDirs": [
+        "/Applications/ArmGNUToolchain/13.2.Rel1/arm-none-eabi/bin"
+    ],
+}
