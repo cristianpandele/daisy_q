@@ -1,0 +1,85 @@
+diff --git a/DubbyPlayground/CMakeLists.txt b/DubbyPlayground/CMakeLists.txt
+new file mode 100644
+index 0000000..cf31317
+--- /dev/null
++++ b/DubbyPlayground/CMakeLists.txt
+@@ -0,0 +1,25 @@
++cmake_minimum_required(VERSION 3.20)
++
++project(DUBBY VERSION 0.5)
++
++set(TARGET dubby)
++
++add_library(
++    ${TARGET}
++    # DubbyPlayground.cpp
++    Dubby.cpp
++)
++
++target_include_directories(
++    ${TARGET}
++    PUBLIC
++    ${CMAKE_CURRENT_SOURCE_DIR}
++    ${CMAKE_SOURCE_DIR}/lib/libDaisy/Drivers/CMSIS/Device/ST/STM32H7xx/Include/
++)
++
++target_link_libraries(
++    ${TARGET}
++    PUBLIC
++    daisy
++    DaisySP
++)
+\ No newline at end of file
+diff --git a/DubbyPlayground/Dubby.cpp b/DubbyPlayground/Dubby.cpp
+index d1a6f5c..f957d25 100644
+--- a/DubbyPlayground/Dubby.cpp
++++ b/DubbyPlayground/Dubby.cpp
+@@ -1,4 +1,5 @@
+ #include "Dubby.h"
++#include "stm32h7xx.h"
+ 
+ using namespace daisy;
+ 
+diff --git a/DubbyPlayground/DubbyPlayground.cpp b/DubbyPlayground/DubbyPlayground.cpp
+index 535d149..cd452c0 100644
+--- a/DubbyPlayground/DubbyPlayground.cpp
++++ b/DubbyPlayground/DubbyPlayground.cpp
+@@ -1,4 +1,3 @@
+-
+ #include "daisysp.h"
+ #include "Dubby.h"
+ 
+@@ -13,15 +12,15 @@ void AudioCallback(AudioHandle::InputBuffer in, AudioHandle::OutputBuffer out, s
+ 
+ 	for (size_t i = 0; i < size; i++)
+ 	{
+-        for (int j = 0; j < 4; j++) 
++        for (int j = 0; j < 4; j++)
+         {
+             out[j][i] = dubby.GetKnobValue(static_cast<Dubby::Ctrl>(j)) * in[j][i];
+ 
+             float sample = out[j][i];
+             sumSquared[j] += sample * sample;
+-        } 
++        }
+ 
+-        dubby.scope_buffer[i] = (out[0][i] + out[1][i]) * .5f;   
++        dubby.scope_buffer[i] = (out[0][i] + out[1][i]) * .5f;
+ 	}
+ 
+     for (int j = 0; j < 4; j++) dubby.currentLevels[j] = sqrt(sumSquared[j] / AUDIO_BLOCK_SIZE);
+@@ -39,12 +38,12 @@ int main(void)
+ 	dubby.seed.SetAudioSampleRate(SaiHandle::Config::SampleRate::SAI_48KHZ);
+     dubby.ProcessAllControls();
+ 
+-    dubby.DrawLogo(); 
++    dubby.DrawLogo();
+     System::Delay(1000);
+ 	dubby.seed.StartAudio(AudioCallback);
+     dubby.UpdateMenu(0, false);
+ 
+-	while(1) { 
++	while(1) {
+         dubby.ProcessAllControls();
+         dubby.UpdateDisplay();
+ 	}
