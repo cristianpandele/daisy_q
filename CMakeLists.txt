@@ -1,17 +1,18 @@
 cmake_policy(SET CMP0048 NEW)
-
-project(daisy_q VERSION 0.0.1)
-
 cmake_minimum_required(VERSION 3.20)
+
+project(dubby_q VERSION 0.0.1)
+
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
-set(TARGET daisy_q)
+set(TARGET dubby_q)
 
 set(LIBDAISY_DIR lib/libDaisy)
 set(Q_DIR lib/q)
+set(DUBBY_DIR dubby/DubbyPlayground)
 
 # DaisySP is a CMake project as well, and can be included here...
-# set(DAISYSP_DIR lib/DaisySP)
+set(DAISYSP_DIR lib/DaisySP)
 
 
 option(Q_BUILD_EXAMPLES "" OFF)
@@ -28,16 +29,22 @@ set(OCD_PROGRAM ${OCD} -s ${OCD_DIR} ${OCDFLAGS} -c "program ${TARGET}.elf verif
 
 add_subdirectory(${LIBDAISY_DIR})
 add_subdirectory(${Q_DIR})
-#add_subdirectory(${DAISYSP_DIR})
+add_subdirectory(${DUBBY_DIR})
+add_subdirectory(${DAISYSP_DIR})
 
 include_directories(src)
 
-add_executable(${TARGET} src/main.cpp)
+add_executable(
+  ${TARGET}
+  dubby
+  src/main.cpp
+)
 
 target_link_libraries(${TARGET} PUBLIC 
-    libq 
-    daisy 
-#   DaisySP 
+    libq
+    daisy
+    DaisySP
+    dubby
 )
 
 get_filename_component(LIBDAISY_DIR_ABS "${LIBDAISY_DIR}"
