@@ -49,7 +49,7 @@ q::phase f0_phase          = q::phase(detected_f0, sample_rate);
 
 
 
-void AudioCallback(AudioHandle::InputBuffer  in,
+void AudioCallback1(AudioHandle::InputBuffer  in,
                    AudioHandle::OutputBuffer out,
                    size_t                    size)
 {
@@ -78,12 +78,12 @@ void AudioCallback(AudioHandle::InputBuffer  in,
     }
 }
 
-int main(void)
+void main1(void)
 {
     // Initialize the hardware
     hardware.Configure();
     hardware.Init();
 
     // Start the audio...
-    hardware.StartAudio(AudioCallback);
+    hardware.StartAudio(AudioCallback1);
 }
