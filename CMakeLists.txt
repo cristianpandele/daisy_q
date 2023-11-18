@@ -14,7 +14,6 @@ set(DUBBY_DIR dubby/DubbyPlayground)
 # DaisySP is a CMake project as well, and can be included here...
 set(DAISYSP_DIR lib/DaisySP)
 
-
 option(Q_BUILD_EXAMPLES "" OFF)
 option(Q_BUILD_TEST "" OFF)
 option(Q_BUILD_IO "" OFF)
@@ -36,11 +35,20 @@ include_directories(src)
 
 add_executable(
   ${TARGET}
-  dubby
   src/main.cpp
 )
 
-target_link_libraries(${TARGET} PUBLIC 
+target_include_directories(
+    ${TARGET}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/libDaisy/Drivers/CMSIS/DSP/Include
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/libDaisy/Drivers/CMSIS/Device/ST/STM32H7xx/Include/
+)
+
+target_link_libraries(
+    ${TARGET}
+    PUBLIC
     libq
     daisy
     DaisySP
