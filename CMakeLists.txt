@@ -8,6 +8,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 set(TARGET dubby_q)
 
 set(LIBDAISY_DIR lib/libDaisy)
+set(LIBDAISY_CORE_DIR ${LIBDAISY_DIR}/core)
 set(Q_DIR lib/q)
 set(DUBBY_DIR dubby/DubbyPlayground)
 
@@ -33,54 +34,84 @@ add_subdirectory(${LIBDAISY_DIR})
 add_subdirectory(${Q_DIR})
 add_subdirectory(${DUBBY_DIR})
 add_subdirectory(${DAISYSP_DIR})
-
-include_directories(src)
+add_subdirectory(${WAVEFOLDER_DIR})
 
 add_executable(
   ${TARGET}
-  src/main.cpp
+    ${WAVEFOLDER_DIR}/main.cpp
 )
 
 target_include_directories(
     ${TARGET}
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/libDaisy/Drivers/CMSIS/DSP/Include
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib/libDaisy/Drivers/CMSIS/Device/ST/STM32H7xx/Include/
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/
 )
 
 target_link_libraries(
-    ${TARGET}
-    PUBLIC
+  ${TARGET}
+  PUBLIC
     libq
-    daisy
     DaisySP
     dubby
+    wavefolder
 )
 
-get_filename_component(LIBDAISY_DIR_ABS "${LIBDAISY_DIR}"
-REALPATH BASE_DIR "${CMAKE_SOURCE_DIR}")
+get_filename_component(LIBDAISY_CORE_DIR_ABS "${LIBDAISY_CORE_DIR}" REALPATH BASE_DIR "${CMAKE_SOURCE_DIR}")
 
-set(LINKER_SCRIPT ${LIBDAISY_DIR_ABS}/core/STM32H750IB_flash.lds)
+set (INTERNAL_ADDRESS 0x08000000)
+set (QSPI_ADDRESS 0x90040000)
 
-set_target_properties(${TARGET} PROPERTIES
-CXX_STANDARD 17
-CXX_STANDARD_REQUIRED YES
-SUFFIX ".elf"
-LINK_DEPENDS ${LINKER_SCRIPT}
+# For the time being, we'll keep the Daisy Bootloader's PID as df11
+# DAISY_PID = a360
+set (DAISY_PID df11)
+set (STM_PID df11)
+
+
+if (${APP_TYPE} STREQUAL "BOOT_NONE")
+  set (LINKER_SCRIPT ${LIBDAISY_CORE_DIR_ABS}/STM32H750IB_flash.lds)
+  set (USBPID $(STM_PID))
+  set (FLASH_ADDRESS $(INTERNAL_ADDRESS))
+elseif(${APP_TYPE} STREQUAL "BOOT_SRAM")
+  set (LINKER_SCRIPT ${LIBDAISY_CORE_DIR_ABS}/STM32H750IB_sram.lds)
+  set (USBPID $(DAISY_PID))
+  set (FLASH_ADDRESS $(QSPI_ADDRESS))
+  set (BOOT_DEFS -DBOOT_APP)
+elseif(${APP_TYPE} STREQUAL "BOOT_QSPI")
+  set (LINKER_SCRIPT ${LIBDAISY_CORE_DIR_ABS}/STM32H750IB_qspi.lds)
+  set (LDSCRIPT $(SYSTEM_FILES_DIR)/STM32H750IB_qspi.lds)
+  set (USBPID $(DAISY_PID))
+  set (FLASH_ADDRESS $(QSPI_ADDRESS))
+  set (BOOT_DEFS -DBOOT_APP)
+else()
+  message(FATAL_ERROR "Unkown app type ${APP_TYPE}")
+endif()
+
+
+# set(LINKER_SCRIPT ${LIBDAISY_CORE_DIR_ABS}/STM32H750IB_flash.lds)
+
+set_target_properties(
+  ${TARGET}
+  PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED YES
+    SUFFIX ".elf"
+    LINK_DEPENDS ${LINKER_SCRIPT}
 )
 
-target_link_options(${TARGET}  PUBLIC
--T ${LINKER_SCRIPT}
--Wl,-Map=${TARGET}.map,--cref
--Wl,--check-sections
--Wl,--unresolved-symbols=report-all
--Wl,--warn-common
--Wl,--warn-section-align
--Wl,--print-memory-usage
+target_link_options(
+  ${TARGET}
+  PUBLIC
+    -T ${LINKER_SCRIPT}
+    -Wl,-Map=${TARGET}.map,--cref
+    -Wl,--check-sections
+    -Wl,--unresolved-symbols=report-all
+    -Wl,--warn-common
+    -Wl,--warn-section-align
+    -Wl,--print-memory-usage
 )
 
-target_compile_options(${TARGET}
+target_compile_options(
+  ${TARGET}
   PUBLIC
     -Os
     -Wall
@@ -93,21 +124,24 @@ target_compile_options(${TARGET}
     -Wno-error=sign-compare
     -fexceptions
     -DQ_DONT_USE_THREADS=1
+    ${BOOT_DEFS}
     $<$<COMPILE_LANGUAGE:CXX>:-Wno-register>
 )
 
-
-add_custom_command(TARGET ${TARGET} POST_BUILD
+add_custom_command(
+  TARGET ${TARGET}
+  POST_BUILD
     COMMAND ${CMAKE_OBJCOPY}
     ARGS -O ihex
     -S ${TARGET}.elf
     ${TARGET}.hex
-    BYPRODUCTS
+  BYPRODUCTS
     ${TARGET}.hex
     COMMENT "Generating HEX image"
 VERBATIM)
 
-add_custom_command(TARGET ${TARGET} POST_BUILD
+add_custom_command(
+  TARGET ${TARGET} POST_BUILD
     COMMAND ${CMAKE_OBJCOPY}
     ARGS -O binary
     -S ${TARGET}.elf

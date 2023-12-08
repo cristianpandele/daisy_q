@@ -15,7 +15,7 @@
       ],
       "type": "shell"
     },
-    {.
+    {
       "command": "make clean; make; make program",
       "label": "build_and_program",
       "options": {
@@ -100,6 +100,24 @@
         "$gcc"
       ],
       "type": "shell"
+    },
+    {
+      "label": "DFU_Dubby_FLASH",
+      "type": "shell",
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "command": "dfu-util -a 0 -s 0x08000000:leave -D ${command:cmake.launchTargetDirectory}/${command:cmake.buildTargetName}.bin -d ,0483:df11"
+      // "command": "echo ${command:cmake.FLASH_ADDRESS} ${command:cmake.launchTargetDirectory}/${command:cmake.buildTargetName}.bin"
+    },
+    {
+      "label": "DFU_Dubby_SRAM_QSPI",
+      "type": "shell",
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "command": "dfu-util -a 0 -s 0x90040000:leave -D ${command:cmake.launchTargetDirectory}/${command:cmake.buildTargetName}.bin -d ,0483:df11"
+      // "command": "echo ${command:cmake.FLASH_ADDRESS} ${command:cmake.launchTargetDirectory}/${command:cmake.buildTargetName}.bin"
     }
   ],
   "version": "2.0.0"

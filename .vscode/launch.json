@@ -10,7 +10,7 @@
         "-d",
         "${workspaceFolder}"
       ],
-      "executable": "${cmake.launchTargetPath}",
+      "executable": "${command:cmake.launchTargetPath}",
       "interface": "swd",
       "name": "Cortex Debug",
       "openOCDLaunchCommands": [
