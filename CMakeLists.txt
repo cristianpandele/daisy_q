@@ -14,6 +14,9 @@ set(DUBBY_DIR dubby/DubbyPlayground)
 # DaisySP is a CMake project as well, and can be included here...
 set(DAISYSP_DIR lib/DaisySP)
 
+# Wavefolder directory
+set(WAVEFOLDER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+
 option(Q_BUILD_EXAMPLES "" OFF)
 option(Q_BUILD_TEST "" OFF)
 option(Q_BUILD_IO "" OFF)
