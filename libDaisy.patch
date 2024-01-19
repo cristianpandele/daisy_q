@@ -37,3 +37,15 @@ index bce0bb7e..9ee431b7 100644
  
      DeInitDma(PeripheralBlock::BLOCK_A);
      DeInitDma(PeripheralBlock::BLOCK_B);
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 22b854cc..2ed1fef5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -67,6 +67,7 @@ add_library(${TARGET} STATIC
+     ${MODULE_DIR}/ui/FullScreenItemMenu.cpp
+     ${MODULE_DIR}/ui/UI.cpp
+     ${MODULE_DIR}/util/color.cpp
++    ${MODULE_DIR}/util/MappedValue.cpp
+     ${MODULE_DIR}/util/WaveTableLoader.cpp
+ 
+     Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.c

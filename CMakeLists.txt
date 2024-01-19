@@ -45,11 +45,13 @@ target_include_directories(
     ${TARGET}
     PRIVATE
       ${CMAKE_CURRENT_SOURCE_DIR}/src/
+      ${LIBDAISY_DIR}/src/
 )
 
 target_link_libraries(
   ${TARGET}
   PUBLIC
+    daisy
     libq
     DaisySP
     dubby
